@@ -1,0 +1,16 @@
+main.Home {
+  box-sizing: border-box;
+  height: 100vh;
+  padding: 1em 2em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  h1 {
+    font-size: 1.5em;
+  }
+
+  p {
+    margin-top: 0;
+  }
+}

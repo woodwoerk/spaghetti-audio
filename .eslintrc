@@ -1,0 +1,24 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "no-param-reassign": [
+      "error",
+      { "props": false }
+    ]
+  },
+  "globals": {
+    "document": true,
+    "window": true,
+    "Element": true,
+    "cancelAnimationFrame": true,
+    "requestAnimationFrame": true,
+    "localStorage": true
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "paths": ["app"]
+      }
+    }
+  }
+}
