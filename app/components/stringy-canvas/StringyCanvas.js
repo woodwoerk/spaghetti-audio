@@ -5,9 +5,9 @@ import { debounce } from 'utils/helpers/PerformanceHelpers';
 import { getKeyboard } from 'utils/helpers/audio-helpers/AudioHelpers';
 
 const vars = {
-  totalPoints: 6,
+  totalPoints: 3,
   viscosity: 10,
-  mouseDist: 10,
+  mouseDist: 40,
   damping: 0.1,
   showIndicators: true,
   leftColor: '#a8d0e6',
@@ -66,6 +66,10 @@ class VectorHelpers {
     ];
 
     return lines.every(({ a, b }) => {
+      // D > 0 == point is on the left-hand side
+      // D < 0 == point is on the right-hand side
+      // D = 0 == point is on the line
+
       const A = -(b.y - a.y);
       const B = b.x - a.x;
       const C = -((A * a.x) + (B * a.x));
@@ -75,6 +79,8 @@ class VectorHelpers {
     });
   }
 }
+
+window.VectorHelpers = VectorHelpers;
 
 class Hitbox {
   constructor(options) {
@@ -95,6 +101,11 @@ class Hitbox {
     this.b = VectorHelpers.getPointFromAngle(p2, angle + (Math.PI / 4), height);
     this.c = VectorHelpers.getPointFromAngle(p2, angle - (Math.PI / 4), height);
     this.d = VectorHelpers.getPointFromAngle(p1, angle - (Math.PI / 4), height);
+  }
+
+  get coords() {
+    const { a, b, c, d } = this;
+    return { a, b, c, d };
   }
 }
 
@@ -143,17 +154,21 @@ class InteractiveVertex {
     const dy = this.initial.y - mouse.current.y;
 
     if (this.hitbox && mouse.speed > 200) {
+      const { a, b, c, d } = this.hitbox.coords;
+      // console.log(`${JSON.stringify(this.current)}, ${JSON.stringify(d)}, ${JSON.stringify(c)}, ${JSON.stringify(b)}, ${JSON.stringify(a)}`)
       // TODO: remove duplicate hit tests
       if ((mouse.direction.x > 0 && mouse.current.x > this.current.x) ||
           (mouse.direction.x < 0 && mouse.current.x < this.current.x)) {
-        if (Math.sqrt(dx * dx) < vars.mouseDist && Math.sqrt(dy * dy) < vertexSeparation) {
+        if (VectorHelpers.isPointInRectangle({ ...mouse.current }, a, b, c, d)) {
+          console.log("HIT X");
           this.handleHitX(mouse.direction.x * mouse.speed);
         }
       }
 
       if ((mouse.direction.y > 0 && mouse.current.y > this.current.y) ||
           (mouse.direction.y < 0 && mouse.current.y < this.current.y)) {
-        if (Math.sqrt(dy * dy) < vars.mouseDist && Math.sqrt(dx * dx) < vertexSeparation) {
+        if (VectorHelpers.isPointInRectangle({ ...mouse.current }, a, b, c, d)) {
+          console.log("HIT Y");
           this.handleHitY(mouse.direction.y * mouse.speed);
         }
       }
