@@ -31,3 +31,11 @@ export const throttle = (func, wait) => {
     }
   };
 };
+
+export const attemptCall = (func) => {
+  if (func && typeof func === 'function') {
+    return func();
+  }
+
+  return false;
+};

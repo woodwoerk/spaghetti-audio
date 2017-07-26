@@ -1,15 +1,15 @@
 import { el } from 'redom';
 import Tone from 'tone';
 import MouseTracker from 'utils/mouse-tracker/MouseTracker';
-import { debounce } from 'utils/helpers/PerformanceHelpers';
+import { debounce, throttle, attemptCall } from 'utils/helpers/PerformanceHelpers';
 import { getKeyboard } from 'utils/helpers/audio-helpers/AudioHelpers';
 
 const vars = {
-  totalPoints: 3,
+  totalPoints: 6,
   viscosity: 10,
-  mouseDist: 40,
+  mouseDist: 20,
   damping: 0.1,
-  showIndicators: true,
+  showIndicators: false,
   leftColor: '#a8d0e6',
   rightColor: '#f76c6c',
 };
@@ -70,9 +70,9 @@ class VectorHelpers {
       // D < 0 == point is on the right-hand side
       // D = 0 == point is on the line
 
-      const A = -(b.y - a.y);
+      const A = -(b.y - a.y); // || 0;
       const B = b.x - a.x;
-      const C = -((A * a.x) + (B * a.x));
+      const C = -((A * a.x) + (B * a.y));
       const D = (A * p.x) + (B * p.y) + C;
 
       return D > 0;
@@ -90,6 +90,7 @@ class Hitbox {
     this.height = height;
     this.angle = angle;
     this.coords = center;
+    this.hitting = false;
   }
 
   set coords(center) {
@@ -107,9 +108,27 @@ class Hitbox {
     const { a, b, c, d } = this;
     return { a, b, c, d };
   }
+
+  hitTest(position, enterCallback, insideCallback, leaveCallback) {
+    const { a, b, c, d } = this.coords;
+
+    if (VectorHelpers.isPointInRectangle(position, a, b, c, d)) {
+      if (!this.hitting) {
+        attemptCall(enterCallback);
+      } else {
+        attemptCall(insideCallback);
+      }
+      this.hitting = true;
+    } else if (this.hitting) {
+      this.hitting = false;
+      attemptCall(leaveCallback);
+    }
+
+    return this.hitting;
+  }
 }
 
-//create a synth and connect it to the master output (your speakers)
+// create a synth and connect it to the master output (your speakers)
 const synth = new Tone.Synth().toMaster();
 const keyboard = getKeyboard('C', 'major pentatonic', 2, 5).reverse();
 
@@ -134,57 +153,40 @@ class InteractiveVertex {
         height: vars.mouseDist,
       });
     this.hitCallback = hitCallback;
-    this.handleHitX = debounce(this.handleHitX.bind(this), 40);
-    this.handleHitY = debounce(this.handleHitY.bind(this), 40);
+    this.handleHit = throttle(this.handleHit.bind(this), 400);
   }
 
-  handleHitX(speed) {
-    if (this.hitCallback) this.hitCallback(speed);
-    this.velocity.x = speed / 20; // divide by angle of shit
+  handleDrag() {
+    this.current.x = ((this.mouse.current.x - this.initial.x) * 0.8) + this.initial.x;
+    this.current.y = ((this.mouse.current.y - this.initial.y) * 0.8) + this.initial.y;
   }
 
-  handleHitY(speed) {
-    if (this.hitCallback) this.hitCallback(speed);
-    this.velocity.y = speed / 20;
-  }
-
-  hitTest() {
-    const { mouse, vertexSeparation } = this;
-    const dx = this.initial.x - mouse.current.x;
-    const dy = this.initial.y - mouse.current.y;
-
-    if (this.hitbox && mouse.speed > 200) {
-      const { a, b, c, d } = this.hitbox.coords;
-      // console.log(`${JSON.stringify(this.current)}, ${JSON.stringify(d)}, ${JSON.stringify(c)}, ${JSON.stringify(b)}, ${JSON.stringify(a)}`)
-      // TODO: remove duplicate hit tests
-      if ((mouse.direction.x > 0 && mouse.current.x > this.current.x) ||
-          (mouse.direction.x < 0 && mouse.current.x < this.current.x)) {
-        if (VectorHelpers.isPointInRectangle({ ...mouse.current }, a, b, c, d)) {
-          console.log("HIT X");
-          this.handleHitX(mouse.direction.x * mouse.speed);
-        }
-      }
-
-      if ((mouse.direction.y > 0 && mouse.current.y > this.current.y) ||
-          (mouse.direction.y < 0 && mouse.current.y < this.current.y)) {
-        if (VectorHelpers.isPointInRectangle({ ...mouse.current }, a, b, c, d)) {
-          console.log("HIT Y");
-          this.handleHitY(mouse.direction.y * mouse.speed);
-        }
-      }
-    }
+  handleHit() {
+    this.velocity.x = (this.mouse.direction.x * this.mouse.speed) / 20;
+    this.velocity.y = (this.mouse.direction.y * this.mouse.speed) / 20;
+    attemptCall(this.hitCallback);
   }
 
   render() {
-    this.dampen('x');
-    this.dampen('y');
     this.applyForce('x');
     this.applyForce('y');
+
+    if (!this.hitbox || !this.hitbox.hitting) {
+      this.dampen('x');
+      this.dampen('y');
+    }
+
     if (this.hitbox) {
       this.hitbox.coords = { x: this.current.x, y: this.current.y };
     }
-    if (!this.mouse.down) {
-      this.hitTest();
+
+    if (!this.mouse.down && this.hitbox && this.mouse.speed) {
+      this.hitbox.hitTest(
+        this.mouse.current,
+        null,
+        this.handleDrag.bind(this),
+        this.handleHit.bind(this),
+      );
     }
   }
 
