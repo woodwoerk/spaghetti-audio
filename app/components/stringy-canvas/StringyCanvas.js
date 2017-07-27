@@ -128,10 +128,6 @@ class Hitbox {
   }
 }
 
-// create a synth and connect it to the master output (your speakers)
-const synth = new Tone.Synth().toMaster();
-const keyboard = getKeyboard('C', 'major pentatonic', 2, 5).reverse();
-
 class InteractiveVertex {
   constructor(options) {
     const { anchor, canvas, mouse, x, y, angle, vertexSeparation, hitCallback } = options;
@@ -206,6 +202,12 @@ class InteractiveVertex {
 
 const MIN_STRING_LENGTH = 30;
 const LOCAL_KEY = 'strings';
+const HI_RANGE = { start: 0, end: 600 };
+const LO_RANGE = { start: 600, end: 1200 };
+
+// create a synth and connect it to the master output (your speakers)
+const synth = new Tone.Synth().toMaster();
+const keyboard = getKeyboard('C', 'major pentatonic', 2, 5).reverse();
 
 class StringyCanvas {
   static getCanvas() {
@@ -288,11 +290,12 @@ class StringyCanvas {
     }
 
     const angle = VectorHelpers.getAngleBetweenVectors({ x: x1, y: y1 }, { x: x2, y: y2 });
-    console.log(angle);
     const vertexSeparation = length / (vars.totalPoints - 1);
-    const note = length > 1000 ?
-      keyboard[keyboard.length] :
-      keyboard[Math.round(length / keyboard.length)];
+    const note = length > HI_RANGE.end ?
+      keyboard[keyboard.length - 1] :
+      keyboard[Math.round(keyboard.length * (length / HI_RANGE.end))];
+
+    console.log(`Angle: ${angle}`, `Length: ${length}`, `Note: ${note}`);
 
     for (let i = 0; i <= vars.totalPoints - 1; i += 1) {
       const { x, y } = VectorHelpers.getCoordsBetweenPoints(
