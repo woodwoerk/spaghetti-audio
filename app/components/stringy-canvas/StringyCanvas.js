@@ -16,10 +16,12 @@ const vars = {
 
 
 class VectorHelpers {
-  /* Return a radian (0 - 2π)
+  /*
+   * Get the angle of a vector determined by two points
    * Measured counter-clockwise from the positive x-axis
+   * Returns a radian (0 - 2π)
    */
-  static getAngleBetweenVectors(a, b) {
+  static getAngle(a, b) {
     const angle = -Math.atan2(b.y - a.y, b.x - a.x);
 
     if (angle < 0) {
@@ -29,10 +31,10 @@ class VectorHelpers {
     return angle;
   }
 
-  static getCoordsBetweenPoints(x1, y1, x2, y2, segment) {
+  static getPointOnVector(a, b, segment) {
     return {
-      x: (segment * x2) + ((1 - segment) * x1),
-      y: (segment * y2) + ((1 - segment) * y1),
+      x: (segment * b.x) + ((1 - segment) * a.x),
+      y: (segment * b.y) + ((1 - segment) * a.y),
     };
   }
 
@@ -264,32 +266,37 @@ class StringyCanvas {
   }
 
   addRandomString() {
-    const x1 = window.innerWidth * Math.random();
-    const x2 = window.innerWidth * Math.random();
-    const y1 = window.innerHeight * Math.random();
-    const y2 = window.innerHeight * Math.random();
-    this.addNewString(x1, y1, x2, y2);
+    const a = {
+      x: window.innerWidth * Math.random(),
+      y: window.innerHeight * Math.random(),
+    };
+    const b = {
+      x: window.innerWidth * Math.random(),
+      y: window.innerHeight * Math.random(),
+    };
+
+    this.addNewString(a, b);
   }
 
-  addNewString(
-    x1 = this.mouse.downPos.x,
-    y1 = this.mouse.downPos.y,
-    x2 = this.mouse.upPos.x,
-    y2 = this.mouse.upPos.y,
-  ) {
-    StringyCanvas.store = { x1, y1, x2, y2 };
-    this.buildString(x1, y1, x2, y2);
+  addNewString(a = {}, b = {}) {
+    a.x = a.x || this.mouse.downPos.x;
+    a.y = a.y || this.mouse.downPos.y;
+    b.x = b.x || this.mouse.upPos.x;
+    b.y = b.y || this.mouse.upPos.y;
+
+    StringyCanvas.store = { a, b };
+    this.buildString(a, b);
   }
 
-  buildString(x1, y1, x2, y2) {
+  buildString(a, b) {
     const points = [];
-    const length = VectorHelpers.getLength({ x: x1, y: y1 }, { x: x2, y: y2 });
+    const length = VectorHelpers.getLength(a, b);
 
     if (length < MIN_STRING_LENGTH) {
       return;
     }
 
-    const angle = VectorHelpers.getAngleBetweenVectors({ x: x1, y: y1 }, { x: x2, y: y2 });
+    const angle = VectorHelpers.getAngle(a, b);
     const vertexSeparation = length / (vars.totalPoints - 1);
     const note = length > HI_RANGE.end ?
       keyboard[keyboard.length - 1] :
@@ -298,8 +305,8 @@ class StringyCanvas {
     console.log(`Angle: ${angle}`, `Length: ${length}`, `Note: ${note}`);
 
     for (let i = 0; i <= vars.totalPoints - 1; i += 1) {
-      const { x, y } = VectorHelpers.getCoordsBetweenPoints(
-        x1, y1, x2, y2, i / (vars.totalPoints - 1),
+      const { x, y } = VectorHelpers.getPointOnVector(
+        a, b, i / (vars.totalPoints - 1),
       );
       points.push(new InteractiveVertex({
         anchor: i === 0 || i === vars.totalPoints - 1,
@@ -334,7 +341,7 @@ class StringyCanvas {
   }
 
   onmount() {
-    StringyCanvas.store.forEach(({ x1, y1, x2, y2 }) => this.buildString(x1, y1, x2, y2));
+    StringyCanvas.store.forEach(({ a, b }) => this.buildString(a, b));
     this.addEventListeners();
     this.onremount();
   }
