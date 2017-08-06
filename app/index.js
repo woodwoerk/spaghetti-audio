@@ -1,3 +1,6 @@
+import { mount } from 'redom';
 import 'normalize.css';
+import SpaghettiAudio from 'components/spaghetti-audio/SpaghettiAudio';
 import './index.scss';
-import './app';
+
+mount(document.body, new SpaghettiAudio());

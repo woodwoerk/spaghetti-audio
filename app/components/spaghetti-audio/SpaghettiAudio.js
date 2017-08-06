@@ -9,7 +9,7 @@ const vars = {
   viscosity: 10,
   mouseDist: 20,
   damping: 0.1,
-  showIndicators: false,
+  debug: false,
   leftColor: '#a8d0e6',
   rightColor: '#f76c6c',
 };
@@ -68,10 +68,6 @@ class VectorHelpers {
     ];
 
     return lines.every(({ a, b }) => {
-      // D > 0 == point is on the left-hand side
-      // D < 0 == point is on the right-hand side
-      // D = 0 == point is on the line
-
       const A = -(b.y - a.y); // || 0;
       const B = b.x - a.x;
       const C = -((A * a.x) + (B * a.y));
@@ -211,7 +207,7 @@ const LO_RANGE = { start: 600, end: 1200 };
 const synth = new Tone.Synth().toMaster();
 const keyboard = getKeyboard('C', 'major pentatonic', 2, 5).reverse();
 
-class StringyCanvas {
+class SpaghettiAudio {
   static getCanvas() {
     const style = {
       position: 'absolute',
@@ -236,8 +232,8 @@ class StringyCanvas {
   }
 
   constructor() {
-    this.canvas = StringyCanvas.getCanvas();
-    this.clearButton = StringyCanvas.getClearButton();
+    this.canvas = SpaghettiAudio.getCanvas();
+    this.clearButton = SpaghettiAudio.getClearButton();
     this.el = el('div', [
       this.canvas,
       this.clearButton,
@@ -251,7 +247,7 @@ class StringyCanvas {
   }
 
   static set store(string) {
-    const strings = StringyCanvas.store;
+    const strings = SpaghettiAudio.store;
     strings.push(string);
     localStorage.setItem('strings', JSON.stringify(strings));
   }
@@ -284,7 +280,7 @@ class StringyCanvas {
     b.x = b.x || this.mouse.upPos.x;
     b.y = b.y || this.mouse.upPos.y;
 
-    StringyCanvas.store = { a, b };
+    SpaghettiAudio.store = { a, b };
     this.buildString(a, b);
   }
 
@@ -341,13 +337,13 @@ class StringyCanvas {
   }
 
   onmount() {
-    StringyCanvas.store.forEach(({ a, b }) => this.buildString(a, b));
+    SpaghettiAudio.store.forEach(({ a, b }) => this.buildString(a, b));
     this.addEventListeners();
     this.onremount();
   }
 
   onremount() {
-    // console.log('StringyCanvas - onremount', this);
+    // console.log('SpaghettiAudio - onremount', this);
 
     cancelAnimationFrame(this.renderLoopId);
     this.canvas.width = window.innerWidth;
@@ -373,8 +369,8 @@ class StringyCanvas {
 
     this.strings.forEach((string) => {
       this.drawString(string.points);
-      if (vars.showIndicators) {
-        this.showDebugLines(string.points);
+      if (vars.debug) {
+        this.debug(string.points);
       }
     });
 
@@ -422,7 +418,7 @@ class StringyCanvas {
     context.stroke();
   }
 
-  showDebugLines(points) {
+  debug(points) {
     const { context } = this;
 
     for (let i = 0; i <= vars.totalPoints - 1; i += 1) {
@@ -452,4 +448,4 @@ class StringyCanvas {
   }
 }
 
-export default StringyCanvas;
+export default SpaghettiAudio;
