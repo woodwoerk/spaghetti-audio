@@ -1,6 +1,6 @@
 import { throttle, attemptCall } from 'utils/helpers/PerformanceHelpers';
 import Hitbox from './Hitbox';
-import settings from './Settings';
+import * as constants from './Constants';
 
 class InteractiveVertex {
   constructor(options) {
@@ -20,7 +20,7 @@ class InteractiveVertex {
         center: this.current,
         angle,
         length: vertexSeparation,
-        height: settings.mouseDist,
+        height: constants.mouseDist,
       });
     this.hitCallback = hitCallback;
     this.handleHit = throttle(this.handleHit.bind(this), 400);
@@ -61,12 +61,12 @@ class InteractiveVertex {
   }
 
   dampen(axis) {
-    this.velocity[axis] += (this.initial[axis] - this.current[axis]) / settings.viscosity;
+    this.velocity[axis] += (this.initial[axis] - this.current[axis]) / constants.viscosity;
   }
 
   applyForce(axis) {
     if (this.velocity[axis] < -0.05 || this.velocity[axis] > 0.05) {
-      this.velocity[axis] *= (1 - settings.damping);
+      this.velocity[axis] *= (1 - constants.damping);
       this.current[axis] += this.velocity[axis];
     } else {
       this.velocity[axis] = 0;

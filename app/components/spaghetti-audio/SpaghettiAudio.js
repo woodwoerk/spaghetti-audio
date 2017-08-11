@@ -5,10 +5,10 @@ import VectorHelpers from 'utils/helpers/VectorHelpers';
 import { debounce } from 'utils/helpers/PerformanceHelpers';
 import { getKeyboard } from 'utils/helpers/audio-helpers/AudioHelpers';
 import InteractiveVertex from './InteractiveVertex';
-import settings from './Settings';
+import * as constants from './Constants';
 
 const MIN_STRING_LENGTH = 30;
-const LOCAL_KEY = 'strings';
+const LOCAL_KEY = 'spaghettiStrings';
 const HI_RANGE = { start: 0, end: 600 };
 const LO_RANGE = { start: 600, end: 1200 };
 
@@ -23,50 +23,85 @@ class SpaghettiAudio {
       top: 0,
       left: 0,
     };
-    const canvas = el('canvas', { style });
 
-    return canvas;
+    return el('canvas', { style });
   }
 
-  static getClearButton() {
+  static getUIContainer() {
     const style = {
       position: 'fixed',
       top: 0,
       right: 0,
       zIndex: 10,
     };
-    const button = el('button', { style }, 'CLEAR');
 
-    return button;
+    return el('div', { style });
   }
 
-  constructor() {
+  static getButton(text) {
+    const style = {
+      display: 'inline-block',
+    };
+
+    return el('button', { style }, text);
+  }
+
+  constructor(options = {}) {
+    this.settings = Object.assign(constants, options);
     this.canvas = SpaghettiAudio.getCanvas();
-    this.clearButton = SpaghettiAudio.getClearButton();
     this.el = el('div', [
       this.canvas,
-      this.clearButton,
+      this.getUI(),
     ]);
+
     this.renderLoopId = null;
     this.strings = [];
     this.context = this.canvas.getContext('2d');
     this.mouse = new MouseTracker(this.canvas, null, this.addNewString.bind(this));
-
     this.resizeHandler = debounce(this.resizeHandler.bind(this), 300);
   }
 
-  static set store(string) {
-    const strings = SpaghettiAudio.store;
-    strings.push(string);
-    localStorage.setItem('strings', JSON.stringify(strings));
+  getUI() {
+    const ui = [];
+
+    if (this.settings.clearButton) {
+      const clear = SpaghettiAudio.getButton('clear');
+      clear.addEventListener('click', e => this.clearStrings(e));
+      ui.push(clear);
+    }
+
+    if (this.settings.muteButton) {
+      const mute = SpaghettiAudio.getButton('mute');
+      mute.addEventListener('click', e => console.log('mute', e));
+      ui.push(mute);
+    }
+
+    return el(SpaghettiAudio.getUIContainer(), ui);
   }
 
-  static get store() {
+  set store(string) {
+    if (!this.settings.localStorage) {
+      return;
+    }
+
+    const strings = this.store;
+    strings.push(string);
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(strings));
+  }
+
+  get store() {
+    if (!this.settings.localStorage) {
+      return [];
+    }
+
     return JSON.parse(localStorage.getItem(LOCAL_KEY)) || [];
   }
 
   clearStrings() {
-    localStorage.removeItem(LOCAL_KEY);
+    if (this.settings.localStorage) {
+      localStorage.removeItem(LOCAL_KEY);
+    }
+
     this.strings = [];
   }
 
@@ -89,7 +124,7 @@ class SpaghettiAudio {
     b.x = b.x || this.mouse.upPos.x;
     b.y = b.y || this.mouse.upPos.y;
 
-    SpaghettiAudio.store = { a, b };
+    this.store = { a, b };
     this.buildString(a, b);
   }
 
@@ -102,19 +137,19 @@ class SpaghettiAudio {
     }
 
     const angle = VectorHelpers.getAngle(a, b);
-    const vertexSeparation = length / (settings.totalPoints - 1);
+    const vertexSeparation = length / (this.settings.totalPoints - 1);
     const note = length > HI_RANGE.end ?
       keyboard[keyboard.length - 1] :
       keyboard[Math.round(keyboard.length * (length / HI_RANGE.end))];
 
     console.log(`Angle: ${angle}`, `Length: ${length}`, `Note: ${note}`);
 
-    for (let i = 0; i <= settings.totalPoints - 1; i += 1) {
+    for (let i = 0; i <= this.settings.totalPoints - 1; i += 1) {
       const { x, y } = VectorHelpers.getPointOnVector(
-        a, b, i / (settings.totalPoints - 1),
+        a, b, i / (this.settings.totalPoints - 1),
       );
       points.push(new InteractiveVertex({
-        anchor: i === 0 || i === settings.totalPoints - 1,
+        anchor: i === 0 || i === this.settings.totalPoints - 1,
         canvas: this.canvas,
         mouse: this.mouse,
         x,
@@ -133,7 +168,6 @@ class SpaghettiAudio {
   }
 
   addEventListeners() {
-    this.clearButton.addEventListener('click', e => this.clearStrings(e));
     window.addEventListener('resize', this.resizeHandler);
   }
 
@@ -146,7 +180,7 @@ class SpaghettiAudio {
   }
 
   onmount() {
-    SpaghettiAudio.store.forEach(({ a, b }) => this.buildString(a, b));
+    this.store.forEach(({ a, b }) => this.buildString(a, b));
     this.addEventListeners();
     this.onremount();
   }
@@ -176,7 +210,7 @@ class SpaghettiAudio {
 
     this.strings.forEach((string) => {
       this.drawString(string.points);
-      if (settings.debug) {
+      if (this.settings.debug) {
         this.debug(string.points);
       }
     });
@@ -189,7 +223,7 @@ class SpaghettiAudio {
   drawLine(p1, p2) {
     const { context } = this;
 
-    context.strokeStyle = settings.rightColor;
+    context.strokeStyle = this.settings.rightColor;
     context.lineWidth = 4;
 
     context.beginPath();
@@ -201,15 +235,15 @@ class SpaghettiAudio {
   drawString(points) {
     const { context } = this;
 
-    for (let i = 1; i <= settings.totalPoints - 2; i += 1) {
+    for (let i = 1; i <= this.settings.totalPoints - 2; i += 1) {
       points[i].render();
     }
 
-    context.strokeStyle = settings.rightColor;
+    context.strokeStyle = this.settings.rightColor;
     context.lineWidth = 4;
     context.beginPath();
 
-    for (let i = 0; i <= settings.totalPoints - 1; i += 1) {
+    for (let i = 0; i <= this.settings.totalPoints - 1; i += 1) {
       const p = points[i];
 
       if (i > 0 && i < points.length - 1) {
@@ -228,7 +262,7 @@ class SpaghettiAudio {
   debug(points) {
     const { context } = this;
 
-    for (let i = 0; i <= settings.totalPoints - 1; i += 1) {
+    for (let i = 0; i <= this.settings.totalPoints - 1; i += 1) {
       const p = points[i];
 
       context.fillStyle = '#000';
