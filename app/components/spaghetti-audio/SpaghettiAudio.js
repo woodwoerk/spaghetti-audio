@@ -164,6 +164,7 @@ class SpaghettiAudio {
       length,
       vertexSeparation,
       points,
+      note,
     });
   }
 
@@ -211,7 +212,7 @@ class SpaghettiAudio {
     this.strings.forEach((string) => {
       this.drawString(string.points);
       if (this.settings.debug) {
-        this.debug(string.points);
+        this.debug(string);
       }
     });
 
@@ -259,8 +260,12 @@ class SpaghettiAudio {
     context.stroke();
   }
 
-  debug(points) {
+  debug({ note, points }) {
     const { context } = this;
+
+    context.font = '16px Arial';
+    context.fillStyle = '#424242';
+    context.fillText(note, points[0].initial.x - 20, points[0].initial.y - 10);
 
     for (let i = 0; i <= this.settings.totalPoints - 1; i += 1) {
       const p = points[i];
@@ -276,7 +281,7 @@ class SpaghettiAudio {
       context.fill();
 
       if (p.hitbox) {
-        context.strokeStyle = '#ff69b4';
+        context.strokeStyle = 'rgba(0, 0, 255, 0.2)';
         context.beginPath();
         context.moveTo(p.hitbox.a.x, p.hitbox.a.y);
         context.lineTo(p.hitbox.b.x, p.hitbox.b.y);
