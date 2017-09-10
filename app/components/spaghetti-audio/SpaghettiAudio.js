@@ -51,7 +51,7 @@ class SpaghettiAudio {
     this.el = el('div', [
       this.canvas,
       this.getUI(),
-    ]);
+    ], { style: { position: 'absolute' } });
 
     this.renderLoopId = null;
     this.strings = [];
@@ -216,7 +216,10 @@ class SpaghettiAudio {
     });
 
     if (this.mouse.down) {
+      this.canvas.style.cursor = 'grabbing';
       this.drawLine(this.mouse.downPos, this.mouse.current);
+    } else {
+      this.canvas.style.cursor = 'crosshair';
     }
   }
 
