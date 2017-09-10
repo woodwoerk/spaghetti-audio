@@ -10,10 +10,9 @@ import * as constants from './Constants';
 const MIN_STRING_LENGTH = 30;
 const LOCAL_KEY = 'spaghettiStrings';
 const HI_RANGE = { start: 0, end: 600 };
-const LO_RANGE = { start: 600, end: 1200 };
+// const LO_RANGE = { start: 600, end: 1200 };
 
-// create a synth and connect it to the master output (your speakers)
-const synth = new Tone.Synth().toMaster();
+const synth = new Tone.PolySynth(4, Tone.Synth).toMaster();
 const keyboard = getKeyboard('C', 'major pentatonic', 2, 5).reverse();
 
 class SpaghettiAudio {
