@@ -1,5 +1,5 @@
-import { throttle } from 'utils/helpers/PerformanceHelpers';
-import MousedownEvents from 'utils/mouse-tracker/MousedownEvents';
+import { throttle } from '../helpers/PerformanceHelpers';
+import MousedownEvents from './MousedownEvents';
 
 class MouseTracker extends MousedownEvents {
   static getDirection(current, initial) {

@@ -1,5 +1,5 @@
-import VectorHelpers from 'utils/helpers/VectorHelpers';
-import { attemptCall } from 'utils/helpers/PerformanceHelpers';
+import VectorHelpers from '../../utils/helpers/VectorHelpers';
+import { attemptCall } from '../../utils/helpers/PerformanceHelpers';
 
 class Hitbox {
   constructor(options) {

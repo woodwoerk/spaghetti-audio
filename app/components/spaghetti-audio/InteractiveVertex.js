@@ -1,4 +1,4 @@
-import { throttle, attemptCall } from 'utils/helpers/PerformanceHelpers';
+import { throttle, attemptCall } from '../../utils/helpers/PerformanceHelpers';
 import Hitbox from './Hitbox';
 import * as constants from './Constants';
 
