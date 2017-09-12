@@ -12,7 +12,10 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'index_bundle.js'
+    filename: 'index_bundle.js',
+    library: 'spaghetti-audio',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   devServer: {
     historyApiFallback: true
