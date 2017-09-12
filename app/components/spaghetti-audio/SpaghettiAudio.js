@@ -51,7 +51,7 @@ class SpaghettiAudio {
     this.el = el('div', [
       this.canvas,
       this.getUI(),
-    ], { style: { position: 'absolute' } });
+    ], { style: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 } });
 
     this.renderLoopId = null;
     this.strings = [];
