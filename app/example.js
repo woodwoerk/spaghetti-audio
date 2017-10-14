@@ -1,4 +1,3 @@
-import { mount } from 'redom';
 import SpaghettiAudio from 'modules/spaghetti-audio';
 import 'normalize.css';
 import './index.scss';
@@ -8,4 +7,5 @@ const spaghettiAudio = new SpaghettiAudio({
   clearButton: true,
 });
 
-mount(document.body, spaghettiAudio);
+document.body.appendChild(spaghettiAudio.canvas);
+document.body.appendChild(spaghettiAudio.ui);

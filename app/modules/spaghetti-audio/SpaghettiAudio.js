@@ -1,9 +1,9 @@
-import { el } from 'redom';
 import Tone from 'tone';
 import MouseTracker from 'utils/mouse-tracker';
 import VectorHelpers from 'utils/helpers/VectorHelpers';
 import { debounce } from 'utils/helpers/PerformanceHelpers';
 import { getKeyboard } from 'utils/helpers/audio-helpers/AudioHelpers';
+import { H } from 'utils/hydrogen';
 import InteractiveVertex from './InteractiveVertex';
 import * as constants from './Constants';
 
@@ -20,13 +20,15 @@ class SpaghettiAudio {
     const style = {
       position: 'absolute',
       top: 0,
+      right: 0,
+      bottom: 0,
       left: 0,
     };
 
-    return el('canvas', { style });
+    return H.canvas({ style });
   }
 
-  static getUIContainer() {
+  static getUIContainer(ui) {
     const style = {
       position: 'fixed',
       top: 0,
@@ -34,51 +36,47 @@ class SpaghettiAudio {
       zIndex: 10,
     };
 
-    return el('div', { style });
-  }
-
-  static getButton(text) {
-    const style = {
-      display: 'inline-block',
-    };
-
-    return el('button', { style }, text);
+    return H.div({ style },
+      ui,
+    );
   }
 
   constructor(options = {}) {
     this.settings = Object.assign(constants, options);
+
     this.canvas = SpaghettiAudio.getCanvas();
-    this.el = el('div', [
-      this.canvas,
-      this.getUI(),
-    ], { style: { position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 5 } });
+    this.ui = this.getUI();
 
     this.renderLoopId = null;
     this.strings = [];
     this.context = this.canvas.getContext('2d');
     this.mouse = new MouseTracker(this.canvas, null, this.addNewString.bind(this));
-    this.resizeHandler = debounce(this.resizeHandler.bind(this), 300);
+    this.onResize = debounce(this.onResize.bind(this), 300);
 
-    this.el.willUnmount = () => this.onunmount();
     this.initialise();
   }
 
   getUI() {
     const ui = [];
+    const buttonStyle = {
+      display: 'inline-block',
+    };
 
     if (this.settings.clearButton) {
-      const clear = SpaghettiAudio.getButton('clear');
-      clear.addEventListener('click', e => this.clearStrings(e));
+      const clear = H.button({ style: buttonStyle, onclick: e => this.clearStrings(e) },
+        'clear',
+      );
       ui.push(clear);
     }
 
     if (this.settings.muteButton) {
-      const mute = SpaghettiAudio.getButton('mute');
-      mute.addEventListener('click', e => console.log('mute', e));
+      const mute = H.button({ style: buttonStyle, onclick: () => false },
+        'mute',
+      );
       ui.push(mute);
     }
 
-    return el(SpaghettiAudio.getUIContainer(), ui);
+    return SpaghettiAudio.getUIContainer(ui);
   }
 
   set store(string) {
@@ -171,11 +169,11 @@ class SpaghettiAudio {
   }
 
   addEventListeners() {
-    window.addEventListener('resize', this.resizeHandler);
+    window.addEventListener('resize', this.onResize);
   }
 
   removeEventListeners() {
-    window.removeEventListener('resize', this.resizeHandler);
+    window.removeEventListener('resize', this.onResize);
   }
 
   onhit(note, hitVelocity) {
@@ -185,25 +183,15 @@ class SpaghettiAudio {
   initialise() {
     this.store.forEach(({ a, b }) => this.buildString(a, b));
     this.addEventListeners();
-    this.onremount();
+    this.start();
   }
 
-  onremount() {
+  start() {
     cancelAnimationFrame(this.renderLoopId);
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
     this.render();
-  }
-
-  onunmount() {
-    this.removeEventListeners();
-    this.mouse.destroy();
-    cancelAnimationFrame(this.renderLoopId);
-  }
-
-  resizeHandler() {
-    this.onremount();
   }
 
   render() {
@@ -224,6 +212,16 @@ class SpaghettiAudio {
     } else {
       this.canvas.style.cursor = 'crosshair';
     }
+  }
+
+  destroy() {
+    this.removeEventListeners();
+    this.mouse.destroy();
+    cancelAnimationFrame(this.renderLoopId);
+  }
+
+  onResize() {
+    this.start();
   }
 
   drawLine(p1, p2) {

@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "normalize.css": "^7.0.0",
-    "redom": "^3.2.1",
     "tone": "^0.10.0"
   }
 }
