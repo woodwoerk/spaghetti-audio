@@ -1,5 +1,5 @@
 import { mount } from 'redom';
-import SpaghettiAudio from 'modules/spaghetti-audio/SpaghettiAudio';
+import SpaghettiAudio from 'modules/spaghetti-audio';
 import 'normalize.css';
 import './index.scss';
 

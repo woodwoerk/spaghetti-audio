@@ -1,6 +1,6 @@
 import { el } from 'redom';
 import Tone from 'tone';
-import MouseTracker from 'utils/mouse-tracker/MouseTracker';
+import MouseTracker from 'utils/mouse-tracker';
 import VectorHelpers from 'utils/helpers/VectorHelpers';
 import { debounce } from 'utils/helpers/PerformanceHelpers';
 import { getKeyboard } from 'utils/helpers/audio-helpers/AudioHelpers';
