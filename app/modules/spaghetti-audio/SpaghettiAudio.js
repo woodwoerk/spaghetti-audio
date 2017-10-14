@@ -51,13 +51,16 @@ class SpaghettiAudio {
     this.el = el('div', [
       this.canvas,
       this.getUI(),
-    ], { style: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, zIndex: 5 } });
+    ], { style: { position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 5 } });
 
     this.renderLoopId = null;
     this.strings = [];
     this.context = this.canvas.getContext('2d');
     this.mouse = new MouseTracker(this.canvas, null, this.addNewString.bind(this));
     this.resizeHandler = debounce(this.resizeHandler.bind(this), 300);
+
+    this.el.willUnmount = () => this.onunmount();
+    this.initialise();
   }
 
   getUI() {
@@ -179,7 +182,7 @@ class SpaghettiAudio {
     synth.triggerAttackRelease(note, '8n');
   }
 
-  onmount() {
+  initialise() {
     this.store.forEach(({ a, b }) => this.buildString(a, b));
     this.addEventListeners();
     this.onremount();

@@ -25,7 +25,7 @@ module.exports = {
   })],
   resolve: {
     alias: {
-      components: path.resolve(__dirname, 'app/components/'),
+      modules: path.resolve(__dirname, 'app/modules/'),
       utils: path.resolve(__dirname, 'app/utils/')
     }
   }

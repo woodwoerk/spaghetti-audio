@@ -1,3 +1,3 @@
-import SpaghettiAudio from 'components/spaghetti-audio/SpaghettiAudio';
+import SpaghettiAudio from 'modules/spaghetti-audio/SpaghettiAudio';
 
 export default SpaghettiAudio;
