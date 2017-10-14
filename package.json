@@ -17,11 +17,12 @@
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
     "webpack": "^3.0.0",
-    "webpack-dev-server": "^2.5.0"
+    "webpack-dev-server": "^2.5.0",
+    "webpack-merge": "^4.1.0"
   },
   "scripts": {
-    "build": "webpack -p",
-    "start": "webpack-dev-server --open -w",
+    "build": "webpack -p --config webpack.prod.js",
+    "start": "webpack-dev-server --hot --inline --config webpack.dev.js",
     "lint": "eslint app/**/*.js"
   },
   "dependencies": {
