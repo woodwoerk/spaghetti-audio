@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import MouseTracker from 'utils/mouse-tracker'
-import VectorHelpers from 'utils/helpers/VectorHelpers'
+import VectorHelpers from 'utils/helpers/vector-helpers.ts'
 import debounce from 'lodash/debounce'
 import { getKeyboard } from 'utils/helpers/audio-helpers/AudioHelpers'
 import { H } from 'utils/hydrogen'
