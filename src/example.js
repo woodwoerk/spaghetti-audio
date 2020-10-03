@@ -1,6 +1,4 @@
-import SpaghettiAudio from 'modules/spaghetti-audio';
-import 'normalize.css';
-import './index.scss';
+import SpaghettiAudio from "modules/spaghetti-audio";
 
 const spaghettiAudio = new SpaghettiAudio({
   localStorage: true,
