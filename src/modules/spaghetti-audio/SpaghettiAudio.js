@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce'
 import { getKeyboard } from 'utils/helpers/audio-helpers/AudioHelpers'
 import { H } from 'utils/hydrogen'
 import InteractiveVertex from './InteractiveVertex'
-import * as constants from './Constants'
+import * as constants from './constants.ts'
 
 const MIN_STRING_LENGTH = 30
 const LOCAL_KEY = 'spaghettiStrings'

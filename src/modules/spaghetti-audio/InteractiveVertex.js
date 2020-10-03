@@ -1,7 +1,7 @@
 import throttle from 'lodash/throttle'
 import { attemptCall } from 'utils/helpers/PerformanceHelpers'
 import Hitbox from './Hitbox'
-import * as constants from './Constants'
+import * as constants from './constants.ts'
 
 class InteractiveVertex {
   constructor(options) {
