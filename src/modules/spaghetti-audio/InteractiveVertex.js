@@ -1,5 +1,5 @@
 import throttle from 'lodash/throttle'
-import { attemptCall } from 'utils/helpers/PerformanceHelpers'
+import { attemptCall } from 'utils/helpers/performance-helpers.ts'
 import Hitbox from './Hitbox'
 import * as constants from './constants.ts'
 
