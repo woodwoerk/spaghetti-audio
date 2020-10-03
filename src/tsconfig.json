@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "noImplicitAny": true,
+    "moduleResolution": "node",
     "module": "es6",
     "target": "es5",
     "allowJs": true,
