@@ -6,14 +6,11 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.ts/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
     ],
-  },
-  resolve: {
-    extensions: ['.ts', '.js'],
   },
   output: {
     filename: 'bundle.js',
@@ -26,9 +23,10 @@ module.exports = {
     }),
   ],
   resolve: {
+    extensions: ['.ts', '.js'],
     alias: {
-      modules: path.resolve(__dirname, 'src/modules/'),
-      utils: path.resolve(__dirname, 'src/utils/'),
+      '@modules': path.resolve(__dirname, 'src/modules/'),
+      '@utils': path.resolve(__dirname, 'src/utils/'),
     },
   },
 }
