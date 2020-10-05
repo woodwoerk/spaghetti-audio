@@ -3,5 +3,5 @@ const common = require('./webpack.common.js')
 
 module.exports = merge(common, {
   devtool: 'inline-source-map',
-  entry: './src/example.js',
+  entry: './src/example.ts',
 })
