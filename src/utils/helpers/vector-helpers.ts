@@ -1,6 +1,13 @@
-interface Point {
+export interface Point {
   x: number
   y: number
+}
+
+export interface Rect {
+  a: Point
+  b: Point
+  c: Point
+  d: Point
 }
 
 class VectorHelpers {
