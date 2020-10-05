@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "module": "es6",
+    "target": "es5",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@utils/*": ["./src/utils/*"],
+      "@modules/*": ["./src/modules/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

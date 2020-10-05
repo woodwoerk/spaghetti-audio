@@ -1,24 +1,15 @@
 {
-  "extends": "airbnb-base",
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
   "rules": {
-    "no-param-reassign": [
-      "error",
-      { "props": false }
-    ]
-  },
-  "globals": {
-    "document": true,
-    "window": true,
-    "Element": true,
-    "cancelAnimationFrame": true,
-    "requestAnimationFrame": true,
-    "localStorage": true
-  },
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "paths": ["app"]
-      }
-    }
+    "no-console": 1,
+    "prettier/prettier": 2
   }
 }

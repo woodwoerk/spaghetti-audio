@@ -1,32 +1,32 @@
-var path = require('path');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require('path')
 
 module.exports = {
-  entry: './app/example.js',
+  entry: './src/index.ts',
   module: {
     rules: [
-      { test: /\.js$/, use: 'babel-loader' },
-      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
-      { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader'] }
-    ]
+      {
+        test: /\.ts/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
   },
   output: {
+    filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    filename: 'index_bundle.js',
-    library: 'spaghetti-audio',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    library: 'SpaghettiAudio',
   },
-  devServer: {
-    historyApiFallback: true
-  },
-  plugins: [new HtmlWebpackPlugin({
-    template: 'app/index.html'
-  })],
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'src/index.html',
+    }),
+  ],
   resolve: {
+    extensions: ['.ts', '.js'],
     alias: {
-      modules: path.resolve(__dirname, 'app/modules/'),
-      utils: path.resolve(__dirname, 'app/utils/')
-    }
-  }
-};
+      '@modules': path.resolve(__dirname, 'src/modules/'),
+      '@utils': path.resolve(__dirname, 'src/utils/'),
+    },
+  },
+}
