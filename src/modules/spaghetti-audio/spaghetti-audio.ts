@@ -103,10 +103,16 @@ class SpaghettiAudio {
   }
 
   private set store(strings: StringPosition[]) {
-    localStorage.setItem(
-      <string>this.settings.localStorageKey,
-      JSON.stringify(strings)
-    )
+    if (!this.settings.withLocalStorage) {
+      return
+    }
+
+    try {
+      localStorage.setItem(
+        <string>this.settings.localStorageKey,
+        JSON.stringify(strings)
+      )
+    } catch {}
   }
 
   private get store(): StringPosition[] {
@@ -114,7 +120,13 @@ class SpaghettiAudio {
       return []
     }
 
-    return JSON.parse(localStorage.getItem(this.settings.localStorageKey)) || []
+    try {
+      return (
+        JSON.parse(localStorage.getItem(this.settings.localStorageKey)) || []
+      )
+    } catch {
+      return []
+    }
   }
 
   private addNewString = (a?: Point, b?: Point): void => {
