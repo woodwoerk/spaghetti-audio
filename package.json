@@ -1,7 +1,7 @@
 {
   "name": "spaghetti-audio",
   "version": "1.0.0",
-  "main": "dist/bundle.js",
+  "main": "dist/spaghetti-audio.js",
   "types": "dist/src/index.d.ts",
   "license": "MIT",
   "devDependencies": {
@@ -34,7 +34,7 @@
     "webpack-merge": "^4.1.0"
   },
   "scripts": {
-    "prepare": "npm run build",
+    "prepublishOnly": "npm run build",
     "build": "webpack -p --config webpack.prod.js",
     "start": "webpack-dev-server --hot --inline --config webpack.dev.js",
     "lint": "eslint . --ext .ts",
