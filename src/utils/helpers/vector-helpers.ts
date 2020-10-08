@@ -44,13 +44,7 @@ class VectorHelpers {
     return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
   }
 
-  static isPointInRectangle(
-    p: Point,
-    a: Point,
-    b: Point,
-    c: Point,
-    d: Point
-  ): boolean {
+  static isPointInRectangle(p: Point, { a, b, c, d }: Rect): boolean {
     const lines = [
       { a, b },
       { a: b, b: c },

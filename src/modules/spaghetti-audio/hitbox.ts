@@ -1,6 +1,8 @@
 import { attemptCall } from '@utils/helpers/performance-helpers'
 import VectorHelpers, { Point, Rect } from '@utils/helpers/vector-helpers'
 
+const RIGHT_ANGLE = Math.PI / 2
+
 class Hitbox {
   hitting: boolean = false
   a: Point
@@ -12,25 +14,29 @@ class Hitbox {
     hitboxCenter: Point,
     readonly angle: number,
     readonly length: number,
-    readonly height: number
+    readonly width: number
   ) {
     this.setCoordsByCenter(hitboxCenter)
   }
 
   setCoordsByCenter(center: Point): void {
-    const { angle, length, height } = this
+    const { angle, length, width } = this
+
+    const halfLength = length / 2
+    const halfWidth = width / 2
+
     const p1 = VectorHelpers.getPointFromAngle(
       center,
       angle + Math.PI,
-      length / 2
+      halfLength
     )
-    const p2 = VectorHelpers.getPointFromAngle(center, angle, length / 2)
+    const p2 = VectorHelpers.getPointFromAngle(center, angle, halfLength)
 
     this.coords = {
-      a: VectorHelpers.getPointFromAngle(p1, angle + Math.PI / 4, height),
-      b: VectorHelpers.getPointFromAngle(p2, angle + Math.PI / 4, height),
-      c: VectorHelpers.getPointFromAngle(p2, angle - Math.PI / 4, height),
-      d: VectorHelpers.getPointFromAngle(p1, angle - Math.PI / 4, height),
+      a: VectorHelpers.getPointFromAngle(p1, angle + RIGHT_ANGLE, halfWidth),
+      b: VectorHelpers.getPointFromAngle(p2, angle + RIGHT_ANGLE, halfWidth),
+      c: VectorHelpers.getPointFromAngle(p2, angle - RIGHT_ANGLE, halfWidth),
+      d: VectorHelpers.getPointFromAngle(p1, angle - RIGHT_ANGLE, halfWidth),
     }
   }
 
@@ -51,18 +57,20 @@ class Hitbox {
     position: Point,
     insideCallback: () => void,
     leaveCallback: () => void
-  ) {
-    const { a, b, c, d } = this.coords
-
-    if (VectorHelpers.isPointInRectangle(position, a, b, c, d)) {
+  ): boolean {
+    if (VectorHelpers.isPointInRectangle(position, this.coords)) {
       attemptCall(insideCallback)
       this.hitting = true
     } else if (this.hitting) {
-      this.hitting = false
-      attemptCall(leaveCallback)
+      this.endHit(leaveCallback)
     }
 
     return this.hitting
+  }
+
+  endHit(leaveCallback: () => void): void {
+    this.hitting = false
+    attemptCall(leaveCallback)
   }
 }
 

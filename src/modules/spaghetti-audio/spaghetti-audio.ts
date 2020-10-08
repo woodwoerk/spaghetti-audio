@@ -5,9 +5,7 @@ import VectorHelpers, { Point } from '@utils/helpers/vector-helpers'
 import { getKeyboard } from '@utils/helpers/audio-helpers'
 import el from '@utils/dom-helpers/dom-helpers'
 import InteractiveVertex from './interactive-vertex'
-import settings, { Setting } from './constants'
-
-type Settings = { [key in Setting]: any }
+import settings, { Settings } from './settings'
 
 interface StringPosition {
   a: Point
@@ -51,13 +49,13 @@ class SpaghettiAudio {
 
   private renderLoopId: number = null
   private strings: String[] = []
-  private settings: Partial<Settings>
+  private settings: Settings
   private context: CanvasRenderingContext2D
   private mouse: MouseTracker
-  readonly canvas = SpaghettiAudio.createCanvas()
+  readonly canvas: HTMLCanvasElement = SpaghettiAudio.createCanvas()
   ui: HTMLElement
 
-  constructor(options: Partial<Settings> = {}) {
+  constructor(options: Settings = {}) {
     this.settings = { ...settings, ...options }
 
     this.init()
@@ -132,12 +130,12 @@ class SpaghettiAudio {
   private addNewString = (a?: Point, b?: Point): void => {
     const string = {
       a: {
-        x: a?.x || this.mouse.downPos.x,
-        y: a?.y || this.mouse.downPos.y,
+        x: a?.x || this.mouse.startPos.x,
+        y: a?.y || this.mouse.startPos.y,
       },
       b: {
-        x: b?.x || this.mouse.upPos.x,
-        y: b?.y || this.mouse.upPos.y,
+        x: b?.x || this.mouse.endPos.x,
+        y: b?.y || this.mouse.endPos.y,
       },
     }
 
@@ -169,7 +167,8 @@ class SpaghettiAudio {
           angle,
           vertexSeparation,
           this.mouse,
-          () => this.onStrumString(note)
+          () => this.onStrumString(note),
+          this.settings
         )
       )
     }
@@ -226,7 +225,7 @@ class SpaghettiAudio {
     this.context = this.canvas.getContext('2d')
     this.mouse = new MouseTracker(this.canvas, null, this.addNewString)
     this.store.forEach(({ a, b }) => this.buildString(a, b))
-    this.onResize = debounce(this.onResize.bind(this), 300)
+    this.onResize = debounce(this.onResize, 300)
     this.addEventListeners()
 
     this.start()
@@ -235,14 +234,15 @@ class SpaghettiAudio {
   private start(): void {
     cancelAnimationFrame(this.renderLoopId)
 
-    this.canvas.width = window.innerWidth
-    this.canvas.height = window.innerHeight
+    this.canvas.width = this.settings.wrapper?.offsetWidth || window.innerWidth
+    this.canvas.height =
+      this.settings.wrapper?.offsetHeight || window.innerHeight
 
     this.render()
   }
 
-  private render(): void {
-    this.renderLoopId = requestAnimationFrame(this.render.bind(this))
+  private render = (): void => {
+    this.renderLoopId = requestAnimationFrame(this.render)
 
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -254,15 +254,15 @@ class SpaghettiAudio {
       }
     })
 
-    if (this.mouse.down) {
+    if (this.mouse.drawing) {
       this.canvas.style.cursor = 'grabbing'
-      this.drawLine(this.mouse.downPos, this.mouse.current)
+      this.drawLine(this.mouse.startPos, this.mouse.endPos)
     } else {
       this.canvas.style.cursor = 'crosshair'
     }
   }
 
-  private onResize(): void {
+  private onResize = (): void => {
     this.start()
   }
 
@@ -334,8 +334,27 @@ class SpaghettiAudio {
       context.rect(p.control.x - 1, p.control.y - 1, 2, 2)
       context.fill()
 
+      context.fillStyle = '#424242'
+      context.font = '11px Andale Mono, Monospace'
+
+      context.fillText(
+        `[${Math.round(p.current.x)} ${Math.round(p.current.y)}]`,
+        p.current.x,
+        p.current.y
+      )
+
+      context.fillText(
+        `[${Math.round(p.velocity.x * 100) / 100} ${Math.round(
+          p.velocity.x * 100
+        )}] v→`,
+        p.current.x,
+        p.current.y + 10
+      )
+
       if (p.hitbox) {
-        context.strokeStyle = 'rgba(0, 0, 255, 0.2)'
+        context.lineWidth = 4
+        context.strokeStyle = 'rgba(100, 0, 255, 0.2)'
+        context.fillStyle = 'rgba(0, 255, 0, 0.2'
         context.beginPath()
         context.moveTo(p.hitbox.a.x, p.hitbox.a.y)
         context.lineTo(p.hitbox.b.x, p.hitbox.b.y)
@@ -343,6 +362,10 @@ class SpaghettiAudio {
         context.lineTo(p.hitbox.d.x, p.hitbox.d.y)
         context.closePath()
         context.stroke()
+
+        if (p.hitbox.hitting) {
+          context.fill()
+        }
       }
     }
   }
