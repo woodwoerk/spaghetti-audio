@@ -41,8 +41,8 @@ const getScale = (tonic: Note, scale: Scale): string[] => {
 export const getKeyboard = (
   tonicIndex: Note = 'C',
   scale: Scale = 'major pentatonic',
-  lowPitch: number = 2,
-  highPitch: number = 5
+  lowPitch = 2,
+  highPitch = 5
 ): string[] => {
   let keyboardNotes: string[] = []
   const scaleNotes = getScale(tonicIndex, scale)

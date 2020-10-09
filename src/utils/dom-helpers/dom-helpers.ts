@@ -36,18 +36,19 @@ const appendArray = (el: HTMLElement, children: Child[]): void => {
   })
 }
 
-const setStyles = (el: HTMLElement, styles: { [key: string]: any }): void => {
+const setStyles = (el: HTMLElement, styles: CSSStyleDeclaration): void => {
   if (!styles) {
     el.removeAttribute('styles')
 
     return
   }
 
-  Object.keys(styles).forEach((style: string) => {
+  Object.entries(styles).forEach(([style, value]) => {
     if (style in el.style) {
       // Cast CSSStyleDeclaration to any — https://github.com/Microsoft/TypeScript/issues/17827
-      ;(<any>el.style)[style] = styles[style]
+      ;(<any>el.style)[style] = value
     } else {
+      // eslint-disable-next-line no-console
       console.warn(
         `${style} is not a valid style for a <${el.tagName.toLowerCase()}>`
       )
@@ -79,6 +80,7 @@ const makeElement = (
           ;(<any>el)[propName] = value
         }
       } else {
+        // eslint-disable-next-line no-console
         console.warn(`${propName} is not a valid property of a <${type}>`)
       }
     })

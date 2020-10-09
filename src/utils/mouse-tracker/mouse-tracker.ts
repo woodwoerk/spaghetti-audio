@@ -3,7 +3,7 @@ import MousedownEvents from './mousedown-events'
 const SPEED_TRACKER_INTERVAL = 100
 
 class MouseTracker extends MousedownEvents {
-  speed: number = 0
+  speed = 0
   private mouseSpeedInterval: number
 
   constructor(

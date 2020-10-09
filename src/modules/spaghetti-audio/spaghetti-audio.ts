@@ -111,7 +111,9 @@ class SpaghettiAudio {
         <string>this.settings.localStorageKey,
         JSON.stringify(strings)
       )
-    } catch {}
+    } catch {
+      /* Ignore */
+    }
   }
 
   private get store(): StringPosition[] {
@@ -201,6 +203,7 @@ class SpaghettiAudio {
     })
 
     if (this.settings.debug) {
+      // eslint-disable-next-line no-console
       console.log(`Angle: ${angle}`, `Length: ${length}`, `Note: ${note}`)
     }
   }

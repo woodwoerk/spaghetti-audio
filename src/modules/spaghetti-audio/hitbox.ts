@@ -4,7 +4,7 @@ import VectorHelpers, { Point, Rect } from '@utils/helpers/vector-helpers'
 const RIGHT_ANGLE = Math.PI / 2
 
 class Hitbox {
-  hitting: boolean = false
+  hitting = false
   a: Point
   b: Point
   c: Point

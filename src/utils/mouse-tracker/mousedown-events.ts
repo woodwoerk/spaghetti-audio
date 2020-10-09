@@ -16,10 +16,10 @@ class MousedownEvents {
   }
 
   protected last: Point
-  protected travel: number = 0
+  protected travel = 0
 
   public direction: Point = { x: 0, y: 0 }
-  public drawing: boolean = false
+  public drawing = false
   public startPos: Point = { x: -1, y: -1 }
   public endPos: Point = { x: undefined, y: undefined }
   public current: Point = { x: undefined, y: undefined }
@@ -55,14 +55,14 @@ class MousedownEvents {
     document.addEventListener('mouseout', this.onLeaveDocument)
   }
 
-  removeEventListeners() {
+  removeEventListeners(): void {
     this.canvas.removeEventListener('mousedown', this.onMouseDown)
     this.canvas.removeEventListener('mouseup', this.onMouseUp)
 
     document.removeEventListener('mouseout', this.onLeaveDocument) // TODO: maybe this should be the canvas for non full screen demos
   }
 
-  destroy() {
+  destroy(): void {
     this.removeEventListeners()
   }
 
@@ -116,7 +116,7 @@ class MousedownEvents {
     const from = e.relatedTarget
 
     if (!from) {
-      this.onMouseUp(e)
+      this.onMouseUp()
     }
   }
 
@@ -127,7 +127,7 @@ class MousedownEvents {
     this.startPos = this.getEventPosition(e)
   }
 
-  private onMouseUp = (e: MouseEvent) => {
+  private onMouseUp = () => {
     if (this.drawing) {
       attemptCall(this.mouseUpCallback)
       this.drawing = false

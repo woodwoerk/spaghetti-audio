@@ -1,7 +1,5 @@
-export const attemptCall = (func: () => any) => {
+export const attemptCall = (func: () => void): void => {
   if (typeof func === 'function') {
-    return func()
+    func()
   }
-
-  return false
 }
