@@ -209,18 +209,27 @@ class SpaghettiAudio {
   }
 
   private addEventListeners(): void {
+    this.canvas.addEventListener('click', this.startAudioContext)
+    this.canvas.addEventListener('touchstart', this.startAudioContext)
     window.addEventListener('resize', this.onResize)
   }
 
   private removeEventListeners(): void {
+    this.canvas.removeEventListener('click', this.startAudioContext)
+    this.canvas.removeEventListener('touchstart', this.startAudioContext)
     window.removeEventListener('resize', this.onResize)
   }
 
-  private onStrumString(note: string): void {
+  /**
+   * Most browsers require interaction before starting the Web Audio context
+   */
+  private async startAudioContext(): Promise<void> {
     if (Tone.context.state !== 'running') {
-      Tone.context.resume()
+      await Tone.start()
     }
+  }
 
+  private onStrumString(note: string): void {
     synth.triggerAttackRelease(note, '8n')
   }
 
