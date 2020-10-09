@@ -12,7 +12,7 @@ interface StringPosition {
   b: Point
 }
 
-interface String {
+interface SpaghettiString {
   length: number
   vertexSeparation: number
   points: InteractiveVertex[]
@@ -48,7 +48,7 @@ class SpaghettiAudio {
   }
 
   private renderLoopId: number = null
-  private strings: String[] = []
+  private strings: SpaghettiString[] = []
   private settings: Settings
   private context: CanvasRenderingContext2D
   private mouse: MouseTracker
@@ -313,7 +313,7 @@ class SpaghettiAudio {
     context.stroke()
   }
 
-  private drawDebugger(string: String): void {
+  private drawDebugger(string: SpaghettiString): void {
     const { note, points } = string
     const { context } = this
 
