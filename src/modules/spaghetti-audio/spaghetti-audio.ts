@@ -70,6 +70,7 @@ class SpaghettiAudio {
     if (this.settings.withClearButton) {
       const clearButton = el.button(
         {
+          className: 'spaghetti-audio__clear',
           style: buttonStyle,
           onclick: () => this.clearStrings(),
         },
