@@ -27,10 +27,6 @@ class SpaghettiAudio {
   private static createCanvas(): HTMLCanvasElement {
     const style = {
       position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
     }
 
     return el.canvas({ style }) as HTMLCanvasElement
@@ -38,13 +34,13 @@ class SpaghettiAudio {
 
   private static createUIContainer(ui: HTMLElement[]) {
     const style = {
-      position: 'fixed',
+      position: 'absolute',
       top: 0,
       right: 0,
       zIndex: 10,
     }
 
-    return el.div({ style }, ui)
+    return el.div({ className: 'spaghetti-audio__ui', style }, ui)
   }
 
   private renderLoopId: number = null
@@ -63,15 +59,11 @@ class SpaghettiAudio {
 
   private createUI(): HTMLElement {
     const ui = []
-    const buttonStyle = {
-      display: 'inline-block',
-    }
 
     if (this.settings.withClearButton) {
       const clearButton = el.button(
         {
           className: 'spaghetti-audio__clear',
-          style: buttonStyle,
           onclick: () => this.clearStrings(),
         },
         'Clear'
