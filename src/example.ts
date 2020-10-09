@@ -4,7 +4,9 @@ const spaghettiAudio = new SpaghettiAudio({
   withLocalStorage: true,
   withClearButton: true,
   spaghettiWidth: 10,
-  debug: true,
+  hitboxSize: 60,
+  viscosity: 8,
+  damping: 0.1,
 })
 
 document.body.appendChild(spaghettiAudio.canvas)

@@ -3,16 +3,18 @@ import { attemptCall } from '@utils/helpers/performance-helpers'
 import { Point } from '@utils/helpers/vector-helpers'
 import MouseTracker from '@utils/mouse-tracker'
 import Hitbox from './hitbox'
-import * as constants from './constants'
+import { Settings } from './settings'
 
 type Axis = 'x' | 'y'
+
+const RELEASE_TOUCH_SPEED = 50
 
 class InteractiveVertex {
   current: Point
   control: Point
   initial: Point
   hitbox: null | Hitbox
-  private velocity: Point = { x: 0, y: 0 }
+  velocity: Point = { x: 0, y: 0 }
 
   constructor(
     anchor: boolean,
@@ -21,7 +23,8 @@ class InteractiveVertex {
     angle: number,
     vertexSeparation: number,
     private readonly mouse: MouseTracker,
-    private readonly hitCallback: () => void
+    private readonly hitCallback: () => void,
+    private readonly settings: Settings
   ) {
     this.current = { x, y }
     this.initial = { x, y }
@@ -29,24 +32,33 @@ class InteractiveVertex {
 
     this.hitbox = anchor
       ? null
-      : new Hitbox(this.current, angle, vertexSeparation, constants.mouseDist)
+      : new Hitbox(
+          this.current,
+          angle,
+          vertexSeparation,
+          this.settings.hitboxSize
+        )
 
-    this.handleStrum = throttle(this.handleStrum.bind(this), 400, {
+    this.handleRelease = throttle(this.handleRelease, 400, {
       leading: true,
       trailing: false,
     })
   }
 
-  private handleDrag(): void {
+  private handleDrag = (): void => {
     this.current.x =
       (this.mouse.current.x - this.initial.x) * 0.8 + this.initial.x
     this.current.y =
       (this.mouse.current.y - this.initial.y) * 0.8 + this.initial.y
   }
 
-  private handleStrum(): void {
-    this.velocity.x = ((this.mouse.direction.x || 1) * this.mouse.speed) / 20
-    this.velocity.y = ((this.mouse.direction.y || 1) * this.mouse.speed) / 20
+  private handleRelease = (): void => {
+    this.velocity.x =
+      ((this.mouse.direction.x || 1) * this.mouse.speed ||
+        RELEASE_TOUCH_SPEED) / 20
+    this.velocity.y =
+      ((this.mouse.direction.y || 1) * this.mouse.speed ||
+        RELEASE_TOUCH_SPEED) / 20
 
     attemptCall(this.hitCallback)
   }
@@ -57,14 +69,16 @@ class InteractiveVertex {
 
     if (this.hitbox) {
       this.hitbox.setCoordsByCenter(this.current)
-    }
 
-    if (!this.mouse.down && this.hitbox && this.mouse.speed) {
-      this.hitbox.hitTest(
-        this.mouse.current,
-        this.handleDrag.bind(this),
-        this.handleStrum.bind(this)
-      )
+      if (!this.mouse.drawing && this.mouse.speed) {
+        this.hitbox.hitTest(
+          this.mouse.current,
+          this.handleDrag,
+          this.handleRelease
+        )
+      } else if (this.wasDragCancelled) {
+        this.hitbox.endHit(this.handleRelease)
+      }
     }
   }
 
@@ -76,6 +90,26 @@ class InteractiveVertex {
   setControlPoint(nextVertex: InteractiveVertex): void {
     this.control.x = (this.current.x + nextVertex.current.x) / 2
     this.control.y = (this.current.y + nextVertex.current.y) / 2
+  }
+
+  private get wasDragCancelled(): boolean {
+    return (
+      this.hitbox.hitting &&
+      this.hasMoved &&
+      !this.lerping &&
+      !this.mouse.drawing &&
+      !this.mouse.touching
+    )
+  }
+
+  private get lerping(): boolean {
+    return this.velocity.x !== 0 || this.velocity.y !== 0
+  }
+
+  private get hasMoved(): boolean {
+    return (
+      this.current.x !== this.initial.x || this.current.y !== this.initial.y
+    )
   }
 
   private lerpVertex(axis: Axis): void {
@@ -93,11 +127,11 @@ class InteractiveVertex {
 
   private dampen(axis: Axis): void {
     this.velocity[axis] +=
-      (this.initial[axis] - this.current[axis]) / constants.viscosity
+      (this.initial[axis] - this.current[axis]) / this.settings.viscosity
   }
 
   private applyForce(axis: Axis): void {
-    this.velocity[axis] *= 1 - constants.damping
+    this.velocity[axis] *= 1 - this.settings.damping
     this.current[axis] += this.velocity[axis]
   }
 }

@@ -13,9 +13,11 @@ module.exports = {
     ],
   },
   output: {
-    filename: 'bundle.js',
+    filename: 'spaghetti-audio.js',
     path: path.resolve(__dirname, 'dist'),
     library: 'SpaghettiAudio',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
