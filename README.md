@@ -8,25 +8,23 @@
 
 If Spaghetti Audio is exactly what you've been searching for, you too can enjoy the sonic taste of spaghetti sound waves by following these steps:
 
-### Doing it
-
 1. Install via npm or yarn
 
-```bash
-npm i spaghetti-audio
-```
+   ```bash
+   npm i spaghetti-audio
+   ```
 
 2. Create some spaghetti
 
-```javascript
-import SpaghettiAudio from 'spaghetti-audio'
+   ```javascript
+   import SpaghettiAudio from 'spaghetti-audio'
 
-const spaghettiAudio = new SpaghettiAudio()
+   const spaghettiAudio = new SpaghettiAudio()
 
-// All the spaghetti goodness is rendered to a canvas element,
-// so here we attach that to the DOM
-document.body.appendChild(spaghettiAudio.canvas)
-```
+   // All the spaghetti goodness is rendered to a canvas element,
+   // so here we attach that to the DOM
+   document.body.appendChild(spaghettiAudio.canvas)
+   ```
 
 ### Attaching to a wrapper
 
