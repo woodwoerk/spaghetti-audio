@@ -1,6 +1,6 @@
 {
   "name": "spaghetti-audio",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "dist/spaghetti-audio.js",
   "types": "dist/src/index.d.ts",
   "license": "MIT",
