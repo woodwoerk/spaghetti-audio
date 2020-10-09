@@ -2,7 +2,7 @@
 
 ## The Web Audio musical instrument nobody asked for
 
-![Spaghetti Audio](https://i.ibb.co/N6rQgj4/spaghetti-audio.gif)
+![Spaghetti Audio](https://i.ibb.co/ch2GPR2/spaghetti-audio-640.gif)
 
 ## Usage
 
