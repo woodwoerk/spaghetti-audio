@@ -1,5 +1,7 @@
 {
   "name": "spaghetti-audio",
+  "description": "The musical instrument nobody asked for",
+  "repository": "https://github.com/woodwoerk/spaghetti-audio",
   "version": "1.1.0",
   "main": "dist/spaghetti-audio.js",
   "types": "dist/src/index.d.ts",
