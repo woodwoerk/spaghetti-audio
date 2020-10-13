@@ -2,7 +2,7 @@
 
 > ## The musical instrument nobody asked for
 
-![Spaghetti Audio](./spaghetti-audio.gif)
+![Spaghetti Audio](https://i.ibb.co/YddLy4z/spaghetti-audio.gif)
 
 Spaghetti Audio combines the Web Audio API via [Tone.js](https://tonejs.github.io/) and an interactive canvas to let you draw and strum strings
 
