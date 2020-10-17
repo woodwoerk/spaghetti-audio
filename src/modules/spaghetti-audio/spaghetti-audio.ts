@@ -163,7 +163,7 @@ class SpaghettiAudio {
           vertexSeparation,
           this.mouse,
           () => this.onStrumString(note),
-          this.settings
+          this.settings.hitboxSize
         )
       )
     }
@@ -302,7 +302,11 @@ class SpaghettiAudio {
 
       // First and last points are static, so no need to animate them
       if (!isFirst && !isLast) {
-        point.render()
+        point.render(
+          this.settings.viscosity,
+          this.settings.damping,
+          this.settings.hitboxSize
+        )
       }
 
       context.bezierCurveTo(

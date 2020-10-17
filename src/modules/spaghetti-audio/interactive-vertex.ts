@@ -3,7 +3,6 @@ import { attemptCall } from '@utils/helpers/performance-helpers'
 import { Point } from '@utils/helpers/vector-helpers'
 import MouseTracker from '@utils/mouse-tracker'
 import Hitbox from './hitbox'
-import { Settings } from './settings'
 
 type Axis = 'x' | 'y'
 
@@ -24,7 +23,7 @@ class InteractiveVertex {
     vertexSeparation: number,
     private readonly mouse: MouseTracker,
     private readonly hitCallback: () => void,
-    private readonly settings: Settings
+    hitboxWidth: number
   ) {
     this.current = { x, y }
     this.initial = { x, y }
@@ -32,12 +31,7 @@ class InteractiveVertex {
 
     this.hitbox = anchor
       ? null
-      : new Hitbox(
-          this.current,
-          angle,
-          vertexSeparation,
-          this.settings.hitboxSize
-        )
+      : new Hitbox(this.current, angle, vertexSeparation, hitboxWidth)
 
     this.handleRelease = throttle(this.handleRelease, 400, {
       leading: true,
@@ -63,12 +57,12 @@ class InteractiveVertex {
     attemptCall(this.hitCallback)
   }
 
-  render(): void {
-    this.lerpVertex('x')
-    this.lerpVertex('y')
+  render(viscosity: number, damping: number, hitboxWidth: number): void {
+    this.lerpVertex('x', viscosity, damping)
+    this.lerpVertex('y', viscosity, damping)
 
     if (this.hitbox) {
-      this.hitbox.setCoordsByCenter(this.current)
+      this.hitbox.setCoordsByCenter(this.current, hitboxWidth)
 
       if (!this.mouse.drawing && this.mouse.speed) {
         this.hitbox.hitTest(
@@ -112,12 +106,12 @@ class InteractiveVertex {
     )
   }
 
-  private lerpVertex(axis: Axis): void {
+  private lerpVertex(axis: Axis, viscosity: number, damping: number): void {
     if (this.velocity[axis] < -0.01 || this.velocity[axis] > 0.01) {
-      this.applyForce(axis)
+      this.applyForce(axis, damping)
 
       if (!this.hitbox || !this.hitbox.hitting) {
-        this.dampen(axis)
+        this.dampen(axis, viscosity)
       }
     } else if (this.velocity[axis] !== 0) {
       this.velocity[axis] = 0
@@ -125,13 +119,12 @@ class InteractiveVertex {
     }
   }
 
-  private dampen(axis: Axis): void {
-    this.velocity[axis] +=
-      (this.initial[axis] - this.current[axis]) / this.settings.viscosity
+  private dampen(axis: Axis, viscosity: number): void {
+    this.velocity[axis] += (this.initial[axis] - this.current[axis]) / viscosity
   }
 
-  private applyForce(axis: Axis): void {
-    this.velocity[axis] *= 1 - this.settings.damping
+  private applyForce(axis: Axis, damping: number): void {
+    this.velocity[axis] *= 1 - damping
     this.current[axis] += this.velocity[axis]
   }
 }

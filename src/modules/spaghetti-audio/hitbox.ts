@@ -14,13 +14,13 @@ class Hitbox {
     hitboxCenter: Point,
     readonly angle: number,
     readonly length: number,
-    readonly width: number
+    width: number
   ) {
-    this.setCoordsByCenter(hitboxCenter)
+    this.setCoordsByCenter(hitboxCenter, width)
   }
 
-  setCoordsByCenter(center: Point): void {
-    const { angle, length, width } = this
+  setCoordsByCenter(center: Point, width: number): void {
+    const { angle, length } = this
 
     const halfLength = length / 2
     const halfWidth = width / 2
