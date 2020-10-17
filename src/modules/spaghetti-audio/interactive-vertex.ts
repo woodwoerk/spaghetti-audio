@@ -55,10 +55,10 @@ class InteractiveVertex {
   private handleRelease = (): void => {
     this.velocity.x =
       ((this.mouse.direction.x || 1) * this.mouse.speed ||
-        RELEASE_TOUCH_SPEED) / 20
+        RELEASE_TOUCH_SPEED) / 50
     this.velocity.y =
       ((this.mouse.direction.y || 1) * this.mouse.speed ||
-        RELEASE_TOUCH_SPEED) / 20
+        RELEASE_TOUCH_SPEED) / 50
 
     attemptCall(this.hitCallback)
   }
