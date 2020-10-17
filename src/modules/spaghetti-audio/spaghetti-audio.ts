@@ -85,14 +85,6 @@ class SpaghettiAudio {
     this.store = [...strings, string]
   }
 
-  private clearStrings() {
-    if (this.settings.withLocalStorage) {
-      localStorage.removeItem(<string>this.settings.localStorageKey)
-    }
-
-    this.strings = []
-  }
-
   private set store(strings: StringPosition[]) {
     if (!this.settings.withLocalStorage) {
       return
@@ -385,6 +377,15 @@ class SpaghettiAudio {
 
     cancelAnimationFrame(this.renderLoopId)
   }
+
+  clearStrings(): void {
+    if (this.settings.withLocalStorage) {
+      localStorage.removeItem(<string>this.settings.localStorageKey)
+    }
+
+    this.strings = []
+  }
+
   updateSettings(settings: Settings): void {
     this.settings = { ...this.settings, ...settings }
   }
