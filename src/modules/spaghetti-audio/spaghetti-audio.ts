@@ -385,6 +385,9 @@ class SpaghettiAudio {
 
     cancelAnimationFrame(this.renderLoopId)
   }
+  updateSettings(settings: Settings): void {
+    this.settings = { ...this.settings, ...settings }
+  }
 }
 
 export default SpaghettiAudio
