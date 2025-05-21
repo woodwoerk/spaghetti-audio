@@ -1,4 +1,4 @@
-# Spaghetti Audio
+# Spaghetti Audio [[Demo 🍝](https://spaghettiaudio.com/)]
 
 > ## The musical instrument nobody asked for
 
